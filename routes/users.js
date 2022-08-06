@@ -10,14 +10,17 @@ router.route('/create')
             const email = req.body.email
             const isEmailAvailable = !(await userRepository.getUser({ 'email': email }))
             if (email && isEmailAvailable) {
+                console.log("Err")
                 const hashedPassword = await bcrypt.hash(req.body.password, 10)
                 req.body.password = hashedPassword
                 await userRepository.createUser(req.body)
                 return res.send(true)
             } else {
+                console.log("Error 500")
                 return res.sendStatus(500)
             }
         } catch (err) {
+            console.log("catch")
             next(err)
             return res.send(err)
         }
