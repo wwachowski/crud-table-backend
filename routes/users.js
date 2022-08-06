@@ -7,7 +7,9 @@ const tokenRepository = require('../tokenRepository')
 router.route('/create')
     .post(async (req, res) => {
         try {
+            console.log("try")
             const email = req.body.email
+            console.log(email)
             const isEmailAvailable = !(await userRepository.getUser({ 'email': email }))
             if (email && isEmailAvailable) {
                 console.log("Err")
@@ -21,7 +23,6 @@ router.route('/create')
             }
         } catch (err) {
             console.log("catch")
-            next(err)
             return res.send(err)
         }
     })
