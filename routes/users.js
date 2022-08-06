@@ -6,8 +6,12 @@ const tokenRepository = require('../tokenRepository')
 
 router.route('/create')
     .post(async (req, res) => {
+        console.log("e")
         const email = req.body.email
-        const isEmailAvailable = !(await userRepository.getUser({ 'email': email }))
+        const isEmailAvailable = !(await userRepository.getUser({ 'email': email }).catch(e=>{
+            console.log(e)
+            return e
+        }))
         if (email && isEmailAvailable) {
             const hashedPassword = await bcrypt.hash(req.body.password, 10)
             req.body.password = hashedPassword
