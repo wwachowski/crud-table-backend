@@ -10,7 +10,7 @@ router.route('/create')
         const email = req.body.email
         const isEmailAvailable = !(await userRepository.getUser({ 'email': email }).catch(e=>{
             console.log(e)
-            return e
+            return res.sendStatus(500)
         }))
         if (email && isEmailAvailable) {
             const hashedPassword = await bcrypt.hash(req.body.password, 10)
