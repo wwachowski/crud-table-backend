@@ -14,10 +14,12 @@ router.route('/create')
                 req.body.password = hashedPassword
                 await userRepository.createUser(req.body)
                 return res.send(true)
-            } 
+            } else {
+                return res.sendStatus(500)
+            }
         } catch (err) {
-            return res(err)
-            // return res.sendStatus(403)
+            next(err)
+            return res.send(err)
         }
     })
 
@@ -50,38 +52,61 @@ router.route('/')
 
 router.route('/:userId')
     .get(async (req, res) => {
-        if (req.doesUserExist) {
-            return res.json(await userRepository.getUser({ 'id': req.id }))
-        } else {
-            return res.sendStatus(500)
+        try {
+            if (req.doesUserExist) {
+                return res.json(await userRepository.getUser({ 'id': req.id }))
+            } else {
+                return res.sendStatus(500)
+            }
+        }
+        catch (err) {
+            next(err)
+            return res.send(err)
         }
     })
     .delete(async (req, res) => {
-        if (req.doesUserExist) {
-            await userRepository.deleteUserById(req.id)
-            return res.send(true)
-        } else {
-            return res.sendStatus(500)
+        try {
+            if (req.doesUserExist) {
+                await userRepository.deleteUserById(req.id)
+                return res.send(true)
+            } else {
+                return res.sendStatus(500)
+            }
+        } catch (err) {
+            next(err)
+            return res.send(err)
         }
     })
     .patch(async (req, res) => {
-        const status = req.body.status
-        if (req.doesUserExist && (status === 'blocked' || status === 'active')) {
-            await userRepository.patchUserStatus(status, req.id)
-            return res.send(true)
-        } else {
-            return res.sendStatus(500)
+        try {
+            const status = req.body.status
+            if (req.doesUserExist && (status === 'blocked' || status === 'active')) {
+                await userRepository.patchUserStatus(status, req.id)
+                return res.send(true)
+            } else {
+                return res.sendStatus(500)
+            }
+        } catch (err) {
+            next(err)
+            return res.send(err)
         }
+
     })
 
 router.param('userId', async (req, res, next, userId) => {
-    req.id = parseInt(userId, 10)
-    if (req.id) {
-        req.doesUserExist = !!(await userRepository.getUser({ "id": parseInt(req.params.userId) }))
-        next()
+    try {
+        req.id = parseInt(userId, 10)
+        if (req.id) {
+            req.doesUserExist = !!(await userRepository.getUser({ "id": parseInt(req.params.userId) }))
+            next()
+        }
+        else {
+            return res.sendStatus(500)
+        }
     }
-    else {
-        return res.sendStatus(500)
+    catch (err) {
+        next(err)
+        return res.send(err)
     }
 })
 

@@ -24,14 +24,19 @@ function authenticateAccessToken(req, res, next) {
 }
 
 function authenticateRefreshToken(req, res, next) {
-    const refreshToken = req.body.refreshToken
-    if (refreshToken && refreshTokens.includes(refreshToken)) {
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (err, user) => {
-            if (err) return res.sendStatus(403)
-            req.newAccessToken=generateAccessToken({ id: user.id, email: user.email })
-            next()
-        })
-    } else return res.sendStatus(403)
+    try {
+        const refreshToken = req.body.refreshToken
+        if (refreshToken && refreshTokens.includes(refreshToken)) {
+            jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (err, user) => {
+                if (err) return res.sendStatus(403)
+                req.newAccessToken = generateAccessToken({ id: user.id, email: user.email })
+                next()
+            })
+        } else return res.sendStatus(403)
+    } catch (err) {
+        next(err)
+        return res.send(err)
+    }
 }
 
 function deleteRefreshToken(refreshToken) {

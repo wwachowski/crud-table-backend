@@ -5,8 +5,8 @@ const bcrypt = require('bcrypt')
 const tokenRepository = require('../tokenRepository')
 router.route('/login')
     .post(async (req, res) => {
-        const user = await userRepository.getUser({ 'email': req.body.email })
         try {
+            const user = await userRepository.getUser({ 'email': req.body.email })
             if (bcrypt.compareSync(req.body.password, user.password) && user.status==='active') {
                 const accessToken = tokenRepository.generateAccessToken({ id: user.id, email: user.email })
                 const refreshToken = tokenRepository.generateRefreshToken({ id: user.id, email: user.email })
