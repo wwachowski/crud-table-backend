@@ -7,23 +7,18 @@ const tokenRepository = require('../tokenRepository')
 router.route('/create')
     .post(async (req, res) => {
         try {
-            console.log("try")
             const email = req.body.email
-            console.log(email)
             const isEmailAvailable = !(await userRepository.getUser({ 'email': email }))
             if (email && isEmailAvailable) {
-                console.log("Err")
                 const hashedPassword = await bcrypt.hash(req.body.password, 10)
                 req.body.password = hashedPassword
                 await userRepository.createUser(req.body)
                 return res.send(true)
             } else {
-                console.log("Error 500")
                 return res.sendStatus(500)
             }
         } catch (err) {
-            console.log("catch")
-            return res.send(err)
+            return res.sendStatus(500)
         }
     })
 
@@ -64,8 +59,7 @@ router.route('/:userId')
             }
         }
         catch (err) {
-            next(err)
-            return res.send(err)
+            return res.sendStatus(500)
         }
     })
     .delete(async (req, res) => {
@@ -77,8 +71,7 @@ router.route('/:userId')
                 return res.sendStatus(500)
             }
         } catch (err) {
-            next(err)
-            return res.send(err)
+            res.sendStatus(500)
         }
     })
     .patch(async (req, res) => {
@@ -91,8 +84,7 @@ router.route('/:userId')
                 return res.sendStatus(500)
             }
         } catch (err) {
-            next(err)
-            return res.send(err)
+            res.sendStatus(500)
         }
 
     })
@@ -109,8 +101,7 @@ router.param('userId', async (req, res, next, userId) => {
         }
     }
     catch (err) {
-        next(err)
-        return res.send(err)
+        res.sendStatus(500)
     }
 })
 
