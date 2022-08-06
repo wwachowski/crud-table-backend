@@ -6,19 +6,15 @@ const tokenRepository = require('../tokenRepository')
 
 router.route('/create')
     .post(async (req, res) => {
-        try {
-            const email = req.body.email
-            const isEmailAvailable = !(await userRepository.getUser({ 'email': email }))
-            if (email && isEmailAvailable) {
-                const hashedPassword = await bcrypt.hash(req.body.password, 10)
-                req.body.password = hashedPassword
-                await userRepository.createUser(req.body)
-                return res.send(true)
-            } else {
-                return res.sendStatus(500)
-            }
-        } catch (err) {
-            return res.sendStatus(500)
+        const email = req.body.email
+        const isEmailAvailable = !(await userRepository.getUser({ 'email': email }))
+        if (email && isEmailAvailable) {
+            const hashedPassword = await bcrypt.hash(req.body.password, 10)
+            req.body.password = hashedPassword
+            await userRepository.createUser(req.body)
+            return res.send(true)
+        } else {
+            return res.sendStatus(400)
         }
     })
 
